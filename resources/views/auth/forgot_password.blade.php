@@ -8,9 +8,7 @@
         <div class="col-lg-5 col-md-7">
             <div class="card p-4 p-md-5 shadow-sm">
                 <div class="text-center mb-4">
-                    <div class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 52px; height: 52px;">
-                        <i class="bi bi-envelope-paper-fill fs-4"></i>
-                    </div>
+                    <img src="{{ asset('images/escr-logo.png') }}" alt="ESCR Official Seal" class="mb-2" style="width: 68px; height: 68px; object-fit: contain;">
                     <h4 class="fw-bold mb-1">Forgot Your Password?</h4>
                     <p class="text-muted small mb-0">
                         Enter your registered ESCR Portal email address and we will send you a password reset link.

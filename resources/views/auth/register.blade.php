@@ -7,8 +7,13 @@
     <div class="row justify-content-center">
         <div class="col-lg-6">
             <div class="card p-4 p-md-5 shadow-sm">
-                <h4 class="fw-bold mb-1"><i class="bi bi-person-plus-fill text-primary me-2"></i>Create Student Applicant Account</h4>
-                <p class="text-muted small mb-4">Register your student portal credentials to begin your online enrollment for SY 2026–2027.</p>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <img src="{{ asset('images/escr-logo.png') }}" alt="ESCR Official Seal" style="width: 56px; height: 56px; object-fit: contain; flex-shrink: 0;">
+                    <div>
+                        <h4 class="fw-bold mb-1">Create Student Applicant Account</h4>
+                        <p class="text-muted small mb-0">Register your student portal credentials to begin your online enrollment for SY 2026–2027.</p>
+                    </div>
+                </div>
 
                 <form action="{{ route('register.submit') }}" method="POST">
                     @csrf

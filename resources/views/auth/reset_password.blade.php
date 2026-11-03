@@ -8,9 +8,7 @@
         <div class="col-lg-5 col-md-7">
             <div class="card p-4 p-md-5 shadow-sm">
                 <div class="text-center mb-4">
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 52px; height: 52px;">
-                        <i class="bi bi-key-fill fs-4"></i>
-                    </div>
+                    <img src="{{ asset('images/escr-logo.png') }}" alt="ESCR Official Seal" class="mb-2" style="width: 68px; height: 68px; object-fit: contain;">
                     <h4 class="fw-bold mb-1">Reset Your Password</h4>
                     <p class="text-muted small mb-0">
                         Enter your current password, your new password, and repeat your new password below.

@@ -76,6 +76,7 @@
 
     <div class="paper-sheet">
         <div class="text-center mb-4">
+            <img src="{{ asset('images/escr-logo.png') }}" alt="ESCR Official Seal" style="width: 64px; height: 64px; object-fit: contain;" class="mb-1">
             <div class="fw-bold" style="font-size: 16px;">EAST SYSTEMS COLLEGES OF RIZAL</div>
             <div style="font-size: 13px;">Morong, Rizal</div>
             <div class="fw-bold mt-1" style="font-size: 20px; letter-spacing: 0.5px;">PROMISSORY NOTE</div>

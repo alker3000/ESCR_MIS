@@ -76,10 +76,13 @@
             <!-- Cleared Examination Permit -->
             <div class="card p-3 p-md-5 bg-white border-success border-2 shadow-sm">
                 <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 border-bottom pb-3 mb-4">
-                    <div>
-                        <h4 class="fw-extrabold mb-0">EAST SYSTEMS COLLEGES OF RIZAL</h4>
-                        <div class="small text-muted">Morong, Rizal &bull; Office of the Registrar &amp; Cashier</div>
-                        <div class="small fw-semibold text-primary">{{ $enrollment->academic_year }} &bull; {{ $enrollment->semester }}</div>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="{{ asset('images/escr-logo.png') }}" alt="ESCR Official Seal" style="width: 60px; height: 60px; object-fit: contain;">
+                        <div>
+                            <h4 class="fw-extrabold mb-0">EAST SYSTEMS COLLEGES OF RIZAL</h4>
+                            <div class="small text-muted">Morong, Rizal &bull; Office of the Registrar &amp; Cashier</div>
+                            <div class="small fw-semibold text-primary">{{ $enrollment->academic_year }} &bull; {{ $enrollment->semester }}</div>
+                        </div>
                     </div>
                     <div class="text-sm-end">
                         <span class="badge bg-success fs-6 px-3 py-2">

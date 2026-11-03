@@ -8,9 +8,7 @@
         <div class="col-lg-5">
             <div class="card p-4 p-md-5 shadow-sm">
                 <div class="text-center mb-4">
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 52px; height: 52px;">
-                        <i class="bi bi-shield-lock-fill fs-4"></i>
-                    </div>
+                    <img src="{{ asset('images/escr-logo.png') }}" alt="ESCR Official Seal" class="mb-2" style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(36, 7, 11, 0.16));">
                     <h4 class="fw-bold mb-1">ESCR Portal Sign In</h4>
                     <p class="text-muted small mb-0">Sign in to access Student, Registrar, Cashier, or Admin services</p>
                 </div>

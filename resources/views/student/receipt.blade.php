@@ -16,10 +16,13 @@
 
         <div class="card p-3 p-md-5 bg-white shadow-sm border-2">
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 border-bottom pb-3 mb-4">
-                <div>
-                    <h4 class="fw-extrabold mb-0 text-uppercase">EAST SYSTEMS COLLEGES OF RIZAL</h4>
-                    <div class="small text-muted">Morong, Rizal &bull; Office of the School Cashier</div>
-                    <div class="small text-muted">{{ $settings['academic_year'] ?? 'SY 2026-2027' }} &bull; {{ $settings['semester'] ?? '1st Semester' }}</div>
+                <div class="d-flex align-items-center gap-3">
+                    <img src="{{ asset('images/escr-logo.png') }}" alt="ESCR Official Seal" style="width: 60px; height: 60px; object-fit: contain;">
+                    <div>
+                        <h4 class="fw-extrabold mb-0 text-uppercase">EAST SYSTEMS COLLEGES OF RIZAL</h4>
+                        <div class="small text-muted">Morong, Rizal &bull; Office of the School Cashier</div>
+                        <div class="small text-muted">{{ $settings['academic_year'] ?? 'SY 2026-2027' }} &bull; {{ $settings['semester'] ?? '1st Semester' }}</div>
+                    </div>
                 </div>
                 <div class="text-sm-end">
                     <span class="badge bg-success fs-6 px-3 py-1 mb-1">OFFICIAL RECEIPT</span>
