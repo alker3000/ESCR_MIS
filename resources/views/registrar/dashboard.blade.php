@@ -3,49 +3,112 @@
 @section('title', 'Registrar Dashboard | ESCR Portal')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+<!-- Screen 1 Style Header: ESCR OVERVIEW (Registrar Hub) -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
-        <h4 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-primary me-2"></i>Office of the Registrar Dashboard</h4>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="aurum-title-uppercase fs-4">ESCR OVERVIEW</span>
+            <span class="badge fw-bold px-2 py-1" style="background: linear-gradient(135deg, #F3D87D, #D4AF37); color: #24070B;">
+                Office of the Registrar Dashboard
+            </span>
+        </div>
         <p class="text-muted small mb-0">Inspect student DMS enrollment credentials, approve applications, and review parent-signed Promissory Notes.</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('registrar.applications') }}" class="btn btn-primary btn-sm fw-semibold">
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{{ route('registrar.applications') }}" class="btn btn-primary btn-sm fw-bold">
             <i class="bi bi-folder-check me-1"></i>Review Applications ({{ $pendingApplicationsCount }})
         </a>
-        <a href="{{ route('registrar.promissory') }}" class="btn btn-danger btn-sm fw-semibold">
+        <a href="{{ route('registrar.promissory') }}" class="btn btn-warning btn-sm fw-bold">
             <i class="bi bi-journal-check me-1"></i>Review Promissory Notes ({{ $pendingPromissoryCount }})
         </a>
     </div>
 </div>
 
-<!-- Metric Cards -->
+<!-- Screen 1 Top Row: 2 Deep Imperial Burgundy Chart Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card p-3 border-start border-4 border-warning">
-            <div class="text-muted small">Pending Document Review</div>
-            <h3 class="fw-bold mb-0">{{ $pendingApplicationsCount }}</h3>
-            <div class="small text-muted">Awaiting Registrar Inspection</div>
+    <div class="col-lg-6">
+        <div class="aurum-dark-card p-3 p-md-4 h-100 d-flex flex-column justify-content-between">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <div class="fw-bold text-white" style="font-size: 0.92rem;">DMS Document &amp; Enrollment Pipeline</div>
+                    <div style="font-size: 0.72rem; color: #D9C3B0;">PSA Birth Cert, Form 138 &amp; Good Moral Inspection</div>
+                </div>
+                <span class="badge" style="background: rgba(212, 175, 55, 0.18); color: #F3D87D; border: 1px solid rgba(212, 175, 55, 0.4);">
+                    {{ $pendingApplicationsCount }} Pending
+                </span>
+            </div>
+            <div class="aurum-mini-bars">
+                <div class="aurum-mini-bar-col"><div class="aurum-mini-bar" style="height: 88%;"></div><div class="aurum-mini-bar-label">BSIT</div></div>
+                <div class="aurum-mini-bar-col"><div class="aurum-mini-bar" style="height: 76%;"></div><div class="aurum-mini-bar-label">BSCS</div></div>
+                <div class="aurum-mini-bar-col"><div class="aurum-mini-bar" style="height: 82%;"></div><div class="aurum-mini-bar-label">BSBA</div></div>
+                <div class="aurum-mini-bar-col"><div class="aurum-mini-bar" style="height: 68%;"></div><div class="aurum-mini-bar-label">BSHM</div></div>
+                <div class="aurum-mini-bar-col"><div class="aurum-mini-bar" style="height: 72%;"></div><div class="aurum-mini-bar-label">BSED</div></div>
+                <div class="aurum-mini-bar-col"><div class="aurum-mini-bar" style="height: 64%;"></div><div class="aurum-mini-bar-label">BSCRIM</div></div>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card p-3 border-start border-4 border-primary">
-            <div class="text-muted small">Approved (Awaiting Payment)</div>
-            <h3 class="fw-bold mb-0">{{ $approvedAwaitingPaymentCount }}</h3>
-            <div class="small text-muted">Tuition Invoice Generated</div>
+    <div class="col-lg-6">
+        <div class="aurum-dark-card p-3 p-md-4 h-100 d-flex flex-column justify-content-between">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div style="font-size: 0.74rem; color: #D9C3B0;">Officially Enrolled Students</div>
+                    <div class="fw-extrabold font-mono mt-1" style="font-size: 1.65rem; color: #F3D87D; line-height: 1.1;">
+                        {{ $enrolledCount }} ENROLLEES
+                    </div>
+                    <div style="font-size: 0.72rem; color: #D9C3B0;">Awaiting Payment: <strong class="text-white">{{ $approvedAwaitingPaymentCount }}</strong> &bull; Promissory Queue: <strong style="color: #F3D87D;">{{ $pendingPromissoryCount }}</strong></div>
+                </div>
+                <a href="{{ route('registrar.students') }}" class="btn btn-sm fw-bold" style="background: rgba(212, 175, 55, 0.16); color: #F3D87D; border: 1px solid rgba(212, 175, 55, 0.45); font-size: 0.74rem;">
+                    <i class="bi bi-people-fill me-1"></i>Directory
+                </a>
+            </div>
+            <div class="mt-2">
+                <svg viewBox="0 0 360 64" class="w-100" style="height: 60px; display: block;">
+                    <defs>
+                        <linearGradient id="aurumRegWave" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.5"/>
+                            <stop offset="100%" stop-color="#D4AF37" stop-opacity="0.0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M0,52 Q45,30 90,38 T180,20 T270,26 T360,10 L360,64 L0,64 Z" fill="url(#aurumRegWave)"/>
+                    <path d="M0,52 Q45,30 90,38 T180,20 T270,26 T360,10" fill="none" stroke="#F3D87D" stroke-width="2.2"/>
+                </svg>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card p-3 border-start border-4 border-success">
-            <div class="text-muted small">Officially Enrolled</div>
-            <h3 class="fw-bold text-success mb-0">{{ $enrolledCount }}</h3>
-            <div class="small text-muted">1st Semester SY 2026–2027</div>
+</div>
+
+<!-- Screen 1 Key Metrics Row (4 White KPI Cards) -->
+<div class="mb-2 d-flex justify-content-between align-items-center">
+    <span class="fw-bold small text-uppercase" style="letter-spacing: 0.06em; color: #5C4346;">Key Metrics</span>
+    <span class="small text-muted">Registrar Operations</span>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="aurum-kpi-card h-100">
+            <div class="aurum-kpi-value">{{ $pendingApplicationsCount }}</div>
+            <div class="aurum-kpi-label">Pending Document Review</div>
+            <div class="aurum-kpi-sub">Awaiting Registrar Inspection</div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card p-3 border-start border-4 border-danger">
-            <div class="text-muted small">Pending Promissory Notes</div>
-            <h3 class="fw-bold text-danger mb-0">{{ $pendingPromissoryCount }}</h3>
-            <div class="small text-muted">Requires Conforme Verification</div>
+    <div class="col-6 col-md-3">
+        <div class="aurum-kpi-card h-100">
+            <div class="aurum-kpi-value">{{ $approvedAwaitingPaymentCount }}</div>
+            <div class="aurum-kpi-label">Approved (Awaiting Payment)</div>
+            <div class="aurum-kpi-sub">Tuition Invoice Generated</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="aurum-kpi-card h-100">
+            <div class="aurum-kpi-value" style="color: #15803D;">{{ $enrolledCount }}</div>
+            <div class="aurum-kpi-label">Officially Enrolled</div>
+            <div class="aurum-kpi-sub">1st Semester SY 2026–2027</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="aurum-kpi-card h-100">
+            <div class="aurum-kpi-value" style="color: #991B1B;">{{ $pendingPromissoryCount }}</div>
+            <div class="aurum-kpi-label">Pending Promissory Notes</div>
+            <div class="aurum-kpi-sub">Requires Conforme Verification</div>
         </div>
     </div>
 </div>

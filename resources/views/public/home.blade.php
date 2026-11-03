@@ -3,15 +3,15 @@
 @section('title', 'East Systems Colleges of Rizal | Online Enrollment & Payment System')
 
 @section('content')
-<div class="py-5" style="background: linear-gradient(135deg, #650f0f 0%, #991b1b 55%, #b91c1c 100%); color: #fff; border-bottom: 4px solid #facc15;">
+<div class="py-5" style="background: linear-gradient(135deg, #24070B 0%, #360B10 55%, #52141D 100%); color: #fff; border-bottom: 4px solid #D4AF37;">
     <div class="container py-3">
         <div class="row align-items-center g-4">
             <div class="col-lg-7">
-                <span class="badge fw-bold px-3 py-2 mb-3 shadow-sm" style="background-color: #facc15; color: #7f1d1d;">
+                <span class="badge fw-bold px-3 py-2 mb-3 shadow-sm" style="background: linear-gradient(135deg, #F3D87D, #D4AF37); color: #24070B;">
                     <i class="bi bi-stars me-1"></i> {{ $settings['academic_year'] ?? 'SY 2026-2027' }} &bull; {{ $settings['semester'] ?? '1st Semester' }} Enrollment Open
                 </span>
                 <h1 class="display-5 fw-extrabold mb-3 text-white">East Systems Colleges of Rizal</h1>
-                <p class="lead mb-4" style="color: #fef9c3;">
+                <p class="lead mb-4" style="color: #F3D87D;">
                     Official Online Enrollment, Document Management, GCash &amp; Cash Installment Billing, Digital Promissory Note, and Uniform Fabric (<em>Tela</em>) Ordering Portal for Morong, Rizal.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
