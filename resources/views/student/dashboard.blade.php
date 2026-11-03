@@ -85,7 +85,18 @@
                         $isPaid = $bInv->status === 'paid';
                         $isPromised = $bInv->status === 'promised';
                         $barHeight = $isPaid ? 92 : ($isPromised ? 55 : 38);
-                        $shortLabel = \Illuminate\Support\Str::limit(explode(' ', $bInv->title)[0] ?? 'Term', 6, '');
+                        $shortLabel = match($bInv->invoice_type) {
+                            'downpayment' => 'Down',
+                            'full_tuition' => 'Full',
+                            'prelim_installment' => 'Prelim',
+                            'midterm_installment' => 'Midterm',
+                            'semifinal_installment' => 'Semi',
+                            'finals_installment' => 'Finals',
+                            'tela_order' => 'Tela',
+                            'special_exam_fee' => 'Special',
+                            'completion_fee' => 'Remedial',
+                            default => \Illuminate\Support\Str::limit(explode(' ', $bInv->title)[0] ?? 'Term', 6, ''),
+                        };
                     @endphp
                     <div class="aurum-mini-bar-col" title="{{ $bInv->title }} (₱{{ number_format((float)$bInv->amount, 2) }} - {{ $bInv->statusLabel() }})">
                         <div class="aurum-mini-bar {{ $isPaid ? '' : 'bar-muted' }}" style="height: {{ $barHeight }}%;"></div>

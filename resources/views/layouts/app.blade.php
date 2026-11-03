@@ -80,6 +80,12 @@
             border-radius: 0.35rem;
             border: 1px solid #E6D7C3;
         }
+        .aurum-dark-card .font-mono,
+        .badge.font-mono {
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
         .table td, .table th, .fs-4, .fs-5, .aurum-metric-val {
             font-variant-numeric: tabular-nums;
         }
@@ -137,7 +143,7 @@
         .escr-topbar .navbar-brand {
             color: #24070B !important;
         }
-        /* Deep Imperial Burgundy Sidebar (Screen 1 Aurum Sidebar) */
+        /* Deep Imperial Burgundy Sidebar (Screen 1 Sticky Aurum Sidebar) */
         .escr-sidebar {
             background: linear-gradient(180deg, #24070B 0%, #360B10 60%, #2A080C 100%);
             border-right: 1px solid #4A121B;
@@ -148,7 +154,11 @@
         }
         @media (min-width: 768px) {
             .escr-sidebar {
-                min-height: calc(100vh - 64px);
+                position: sticky;
+                top: 57px;
+                height: calc(100vh - 57px);
+                overflow-y: auto;
+                align-self: flex-start;
             }
         }
         .escr-sidebar .sidebar-section-label,
@@ -587,7 +597,7 @@
                 @endauth
 
                 <a class="navbar-brand d-flex align-items-center gap-2 fw-bold me-0" href="{{ route('home') }}">
-                    <img src="{{ asset('images/escr-logo.png') }}" alt="East Systems Colleges of Rizal Official Seal" class="flex-shrink-0" style="width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(36, 7, 11, 0.2));">
+                    <img src="{{ asset('images/escr-logo.png') }}" alt="East Systems Colleges of Rizal Official Seal" class="flex-shrink-0 {{ auth()->check() ? 'd-md-none' : '' }}" style="width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(36, 7, 11, 0.2));">
                     <div class="text-truncate">
                         <div class="lh-1 escr-brand-title text-truncate fw-bold" style="font-size: 0.92rem; letter-spacing: 0.08em; color: #24070B;">EAST SYSTEMS COLLEGES OF RIZAL</div>
                         <small class="fw-semibold escr-brand-subtitle d-block text-truncate" style="font-size: 0.7rem; color: #8C6D23; letter-spacing: 0.02em;">
