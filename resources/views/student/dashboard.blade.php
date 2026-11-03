@@ -194,118 +194,196 @@
     </div>
 </div>
 
-<!-- Enrollment Progress Stepper -->
-<div class="card p-3 p-md-4 mb-4">
-    <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-        <h6 class="fw-bold mb-0" style="font-size: 0.92rem;">
-            <i class="bi bi-diagram-3-fill text-primary me-1"></i>Enrollment Progress
-        </h6>
-        @if($enrollment)
-            <span class="badge {{ $enrollment->statusBadgeClass() }} px-2 py-1">{{ $enrollment->statusLabel() }}</span>
+<!-- Unified 3-Card Bento Row: Enrollment Progress (col-lg-6) + Exam Clearance (col-lg-3) + Uniform Tela (col-lg-3) -->
+@php
+    $readyTela = $telaOrders->where('status', 'ready_for_pickup');
+    $overdueInvoice = $invoices->where('status', 'overdue')->first();
+    $unpaidSpecial = $invoices->where('invoice_type', 'special_exam_fee')->where('status', '!=', 'paid')->first();
+@endphp
+<div class="row g-3 mb-4">
+    <!-- 1. Enrollment Progress Stepper (col-lg-6) -->
+    <div class="col-lg-6">
+        <div class="card p-3 p-md-4 h-100 d-flex flex-column justify-content-between">
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+                <h6 class="fw-bold mb-0" style="font-size: 0.92rem;">
+                    <i class="bi bi-diagram-3-fill text-primary me-1"></i>Enrollment Progress
+                </h6>
+                @if($enrollment)
+                    <span class="badge {{ $enrollment->statusBadgeClass() }} px-2 py-1">{{ $enrollment->statusLabel() }}</span>
+                @else
+                    <span class="badge bg-secondary">Not Yet Submitted</span>
+                @endif
+            </div>
+            <div class="d-flex flex-wrap justify-content-between gap-2 my-auto">
+                <div class="stepper-item {{ $step > 1 ? 'step-completed' : ($step === 1 ? 'step-current' : '') }}">
+                    <div class="stepper-circle {{ $step > 1 ? 'bg-success text-white' : ($step === 1 ? 'bg-primary text-white' : 'bg-light text-muted border') }}">
+                        @if($step > 1)<i class="bi bi-check-lg"></i>@else 1 @endif
+                    </div>
+                    <div class="small fw-semibold" style="font-size: 0.76rem;">Submit Form &amp; Docs</div>
+                </div>
+                <div class="stepper-item {{ $step > 2 ? 'step-completed' : ($step === 2 ? 'step-current' : '') }}">
+                    <div class="stepper-circle {{ $status === 'returned' ? 'bg-danger text-white' : ($step > 2 ? 'bg-success text-white' : ($step === 2 ? 'bg-primary text-white' : 'bg-light text-muted border')) }}">
+                        @if($step > 2)<i class="bi bi-check-lg"></i>@else 2 @endif
+                    </div>
+                    <div class="small fw-semibold" style="font-size: 0.76rem;">Registrar Review</div>
+                </div>
+                <div class="stepper-item {{ $step > 3 ? 'step-completed' : ($step === 3 ? 'step-current' : '') }}">
+                    <div class="stepper-circle {{ $step > 3 ? 'bg-success text-white' : ($step === 3 ? 'bg-primary text-white' : 'bg-light text-muted border') }}">
+                        @if($step > 3)<i class="bi bi-check-lg"></i>@else 3 @endif
+                    </div>
+                    <div class="small fw-semibold" style="font-size: 0.76rem;">Initial Payment</div>
+                </div>
+                <div class="stepper-item {{ $step >= 4 ? 'step-completed' : '' }}">
+                    <div class="stepper-circle {{ $step >= 4 ? 'bg-success text-white' : 'bg-light text-muted border' }}">
+                        @if($step >= 4)<i class="bi bi-check-lg"></i>@else 4 @endif
+                    </div>
+                    <div class="small fw-semibold" style="font-size: 0.76rem;">Officially Enrolled</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Exam Clearance Status Card (col-lg-3) -->
+    <div class="col-md-6 col-lg-3">
+        @if($enrollment && $enrollment->status === 'enrolled')
+            @if($enrollment->exam_restricted)
+                <div class="card p-3 h-100 border-danger d-flex flex-column justify-content-between" style="background: #FEF2F2; border-left: 4px solid #DC2626 !important;">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="badge bg-danger"><i class="bi bi-shield-exclamation me-1"></i>RESTRICTED</span>
+                            <i class="bi bi-lock-fill text-danger fs-5"></i>
+                        </div>
+                        <div class="fw-bold text-danger" style="font-size: 0.88rem;">ACCOUNT EXAM RESTRICTED</div>
+                        <p class="text-muted mb-2 mt-1" style="font-size: 0.74rem; line-height: 1.35;">
+                            {{ $enrollment->exam_restriction_reason }}
+                        </p>
+                    </div>
+                    @if($unpaidSpecial)
+                        <a href="{{ route('student.billing.pay', $unpaidSpecial) }}" class="btn btn-gcash btn-sm fw-bold w-100">
+                            <i class="bi bi-wallet2 me-1"></i>Pay Special Fee (₱{{ number_format((float)$unpaidSpecial->amount, 2) }})
+                        </a>
+                    @elseif($overdueInvoice)
+                        <a href="{{ route('student.billing.pay', $overdueInvoice) }}" class="btn btn-danger btn-sm fw-bold w-100">
+                            <i class="bi bi-wallet2 me-1"></i>Pay Overdue to Lift Restriction
+                        </a>
+                    @else
+                        <a href="{{ route('student.billing') }}" class="btn btn-danger btn-sm fw-bold w-100">
+                            <i class="bi bi-wallet2 me-1"></i>Settle Balance to Lift
+                        </a>
+                    @endif
+                </div>
+            @else
+                <div class="card p-3 h-100 d-flex flex-column justify-content-between" style="background: #F0FDF4; border-color: #BBF7D0; border-left: 4px solid #16A34A !important;">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="badge bg-success"><i class="bi bi-patch-check-fill me-1"></i>PERMIT ACTIVE</span>
+                            <i class="bi bi-qr-code-scan text-success fs-5"></i>
+                        </div>
+                        <div class="fw-bold text-success" style="font-size: 0.88rem;">CLEARED FOR EXAMINATION</div>
+                        <p class="text-muted mb-2 mt-1" style="font-size: 0.74rem; line-height: 1.35;">
+                            Your installment payments and exam requirements are up to date.
+                        </p>
+                    </div>
+                    <a href="{{ route('student.clearance') }}" class="btn btn-success btn-sm fw-bold w-100">
+                        <i class="bi bi-qr-code me-1"></i>View Digital Exam Permit
+                    </a>
+                </div>
+            @endif
         @else
-            <span class="badge bg-secondary">Not Yet Submitted</span>
+            <div class="card p-3 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="badge bg-secondary">EXAM CLEARANCE</span>
+                        <i class="bi bi-patch-check text-muted fs-5"></i>
+                    </div>
+                    <div class="fw-bold" style="font-size: 0.88rem; color: #24070B;">Exam Permit Pending</div>
+                    <p class="text-muted mb-2 mt-1" style="font-size: 0.74rem; line-height: 1.35;">
+                        Complete enrollment &amp; initial downpayment to activate your Digital Exam Permit.
+                    </p>
+                </div>
+                <a href="{{ route('student.enrollment') }}" class="btn btn-outline-primary btn-sm fw-semibold w-100">
+                    <i class="bi bi-file-earmark-person me-1"></i>Complete Enrollment
+                </a>
+            </div>
         @endif
     </div>
-    <div class="d-flex flex-wrap justify-content-between gap-2">
-        <div class="stepper-item {{ $step > 1 ? 'step-completed' : ($step === 1 ? 'step-current' : '') }}">
-            <div class="stepper-circle {{ $step > 1 ? 'bg-success text-white' : ($step === 1 ? 'bg-primary text-white' : 'bg-light text-muted border') }}">
-                @if($step > 1)<i class="bi bi-check-lg"></i>@else 1 @endif
+
+    <!-- 3. Uniform Tela & Patch Card (col-lg-3) -->
+    <div class="col-md-6 col-lg-3">
+        @if($readyTela->isNotEmpty())
+            <div class="card p-3 h-100 d-flex flex-column justify-content-between" style="background: #FFFBEB; border-color: #FDE68A; border-left: 4px solid #D4AF37 !important;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="badge text-dark fw-bold" style="background: #F3D87D;"><i class="bi bi-box-seam-fill me-1"></i>READY FOR PICKUP</span>
+                        <i class="bi bi-scissors fs-5" style="color: #AA821B;"></i>
+                    </div>
+                    <div class="fw-bold" style="font-size: 0.84rem; color: #24070B;">UNIFORM FABRIC (TELA) READY FOR PICKUP AT SCHOOL!</div>
+                    <div class="text-muted mt-1 mb-2" style="font-size: 0.73rem; line-height: 1.35;">
+                        @foreach($readyTela as $rt)
+                            Order <strong>{{ $rt->order_number }}</strong> ({{ $rt->itemsSummary() }}) is ready at the Cashier.
+                        @endforeach
+                    </div>
+                </div>
+                <a href="{{ route('student.tela') }}" class="btn btn-warning btn-sm fw-bold w-100">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>View Order Details
+                </a>
             </div>
-            <div class="small fw-semibold">Submit Form &amp; Docs</div>
-        </div>
-        <div class="stepper-item {{ $step > 2 ? 'step-completed' : ($step === 2 ? 'step-current' : '') }}">
-            <div class="stepper-circle {{ $status === 'returned' ? 'bg-danger text-white' : ($step > 2 ? 'bg-success text-white' : ($step === 2 ? 'bg-primary text-white' : 'bg-light text-muted border')) }}">
-                @if($step > 2)<i class="bi bi-check-lg"></i>@else 2 @endif
+        @else
+            <div class="card p-3 h-100 d-flex flex-column justify-content-between" style="border-left: 4px solid #360B10 !important;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="badge" style="background: #F8F1EC; color: #52141D; border: 1px solid #E6D7C3;">TELA STORE</span>
+                        <i class="bi bi-scissors text-primary fs-5"></i>
+                    </div>
+                    <div class="fw-bold" style="font-size: 0.88rem; color: #24070B;">Uniform Fabric &amp; Logo Patch</div>
+                    <p class="text-muted mb-2 mt-1" style="font-size: 0.74rem; line-height: 1.35;">
+                        @if($telaOrders->isNotEmpty())
+                            You have <strong>{{ $telaOrders->count() }}</strong> uniform fabric order(s). Order official blouse/polo, skirt yardage &amp; patches online.
+                        @else
+                            Order official school uniform fabric (<em>tela</em>) and logo patches online for Cashier pickup.
+                        @endif
+                    </p>
+                </div>
+                <a href="{{ route('student.tela') }}" class="btn btn-outline-primary btn-sm fw-bold w-100">
+                    <i class="bi bi-scissors me-1"></i>Order Uniform Tela
+                </a>
             </div>
-            <div class="small fw-semibold">Registrar Doc Review</div>
-        </div>
-        <div class="stepper-item {{ $step > 3 ? 'step-completed' : ($step === 3 ? 'step-current' : '') }}">
-            <div class="stepper-circle {{ $step > 3 ? 'bg-success text-white' : ($step === 3 ? 'bg-primary text-white' : 'bg-light text-muted border') }}">
-                @if($step > 3)<i class="bi bi-check-lg"></i>@else 3 @endif
-            </div>
-            <div class="small fw-semibold">Initial GCash Payment</div>
-        </div>
-        <div class="stepper-item {{ $step >= 4 ? 'step-completed' : '' }}">
-            <div class="stepper-circle {{ $step >= 4 ? 'bg-success text-white' : 'bg-light text-muted border' }}">
-                @if($step >= 4)<i class="bi bi-check-lg"></i>@else 4 @endif
-            </div>
-            <div class="small fw-semibold">Officially Enrolled</div>
-        </div>
+        @endif
     </div>
 </div>
 
-<!-- Exam Clearance Banner -->
-@if($enrollment && $enrollment->status === 'enrolled')
-    @if($enrollment->exam_restricted)
-        <div class="alert alert-danger border-0 shadow-sm p-3 p-md-4 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div>
-                <h5 class="fw-bold mb-1"><i class="bi bi-shield-exclamation me-2"></i>ACCOUNT EXAM RESTRICTED</h5>
-                <p class="mb-0 small">{{ $enrollment->exam_restriction_reason }}</p>
-            </div>
-            <div class="d-flex gap-2 w-100 w-md-auto">
-                @php
-                    $unpaidSpecial = $invoices->where('invoice_type', 'special_exam_fee')->where('status', '!=', 'paid')->first();
-                @endphp
-                @if($unpaidSpecial)
-                    <a href="{{ route('student.billing.pay', $unpaidSpecial) }}" class="btn btn-gcash fw-bold px-3 w-100 w-md-auto">
-                        <i class="bi bi-phone-fill me-1"></i>Pay Special Exam Fee (₱{{ number_format((float)$unpaidSpecial->amount, 2) }}) via GCash
-                    </a>
-                @else
-                    <a href="{{ route('student.promissory') }}" class="btn btn-danger fw-bold px-3 w-100 w-md-auto">
-                        <i class="bi bi-file-earmark-ruled me-1"></i>Submit Promissory Note
-                    </a>
-                @endif
-            </div>
-        </div>
-    @else
-        <div class="alert alert-success border-0 shadow-sm p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-patch-check-fill fs-3 text-success"></i>
-                <div>
-                    <div class="fw-bold">CLEARED FOR EXAMINATION</div>
-                    <div class="small">Your installment payments and exam requirements are up to date.</div>
-                </div>
-            </div>
-            <a href="{{ route('student.clearance') }}" class="btn btn-success btn-sm fw-semibold w-100 w-sm-auto">
-                <i class="bi bi-qr-code me-1"></i>View Digital Exam Permit
-            </a>
-        </div>
-    @endif
-@endif
-
-<!-- Ready for Pickup Uniform Tela Alert -->
-@php
-    $readyTela = $telaOrders->where('status', 'ready_for_pickup');
-@endphp
-@if($readyTela->isNotEmpty())
-    <div class="alert alert-primary border-0 shadow-sm p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <div>
-            <div class="fw-bold"><i class="bi bi-box-seam-fill me-2"></i>UNIFORM FABRIC (TELA) READY FOR PICKUP AT SCHOOL!</div>
-            <div class="small">
-                @foreach($readyTela as $rt)
-                    Order <strong>{{ $rt->order_number }}</strong> ({{ $rt->itemsSummary() }}) is ready at the Cashier's Office. {{ $rt->cashier_remarks }}
-                @endforeach
-            </div>
-        </div>
-        <a href="{{ route('student.tela') }}" class="btn btn-primary btn-sm fw-semibold w-100 w-sm-auto">View Order Details</a>
-    </div>
-@endif
-
+<!-- Full-Width Extended Installment & Payment Schedule Table (col-12) -->
 <div class="row g-4">
-    <!-- Installment & Billing Schedule -->
-    <div class="col-lg-7">
-        <div class="card p-3 p-md-4 h-100">
-            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-                <h6 class="fw-bold mb-0" style="font-size: 0.92rem;"><i class="bi bi-calendar2-week text-primary me-1"></i>1st Sem Payment Schedule</h6>
-                <a href="{{ route('student.billing') }}" class="btn btn-sm btn-outline-primary text-nowrap">Full Ledger</a>
+    <div class="col-12">
+        <div class="card p-3 p-md-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h6 class="fw-bold mb-0" style="font-size: 0.96rem;">
+                        <i class="bi bi-calendar2-week text-primary me-1"></i>{{ $enrollment ? "{$enrollment->semester} Payment Schedule" : '1st Sem Payment Schedule' }}
+                    </h6>
+                    <div class="text-muted" style="font-size: 0.75rem;">
+                        Complete ledger of tuition installments, special fees, and uniform fabric orders. Submit a Promissory Note <strong>before</strong> the deadline if you need to move a term balance to Finals.
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#notificationsDrawer">
+                        <i class="bi bi-bell-fill me-1" style="color: #D4AF37;"></i>Recent Activity &amp; Alerts ({{ $notifications->count() }})
+                    </button>
+                    <a href="{{ route('student.billing', $enrollment ? ['enrollment_id' => $enrollment->id] : []) }}" class="btn btn-sm btn-primary text-nowrap">
+                        <i class="bi bi-wallet2 me-1"></i>Open Full Billing Ledger
+                    </a>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle small mb-0 table-mobile-cards">
                     <thead class="table-light">
                         <tr>
-                            <th>Description</th>
+                            <th>Invoice #</th>
+                            <th>Description &amp; Particulars</th>
+                            <th>Period / Type</th>
                             <th>Deadline</th>
-                            <th>Amount</th>
+                            <th>Assessed Amount</th>
+                            <th>Paid / Balance</th>
                             <th>Status</th>
                             <th class="text-end">Action</th>
                         </tr>
@@ -313,9 +391,13 @@
                     <tbody>
                         @forelse($invoices as $inv)
                             <tr>
-                                <td class="mobile-card-lead" style="min-width: 150px;">
+                                <td data-label="Invoice #" class="font-mono fw-bold text-nowrap">{{ $inv->invoice_number }}</td>
+                                <td class="mobile-card-lead" style="min-width: 200px;">
                                     <div class="fw-bold text-dark">{{ $inv->title }}</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">{{ $inv->invoice_number }}</div>
+                                    <div class="text-muted" style="font-size: 0.74rem;">{{ \Illuminate\Support\Str::limit($inv->description, 85) }}</div>
+                                </td>
+                                <td data-label="Period / Type" class="text-nowrap">
+                                    <span class="badge bg-light text-dark border">{{ $inv->exam_period ?? strtoupper(str_replace('_', ' ', $inv->invoice_type)) }}</span>
                                 </td>
                                 <td data-label="Deadline" class="text-nowrap">
                                     @if($inv->status === 'promised')
@@ -323,12 +405,14 @@
                                     @elseif($inv->promised_date)
                                         <span class="text-primary fw-semibold">Promised: {{ $inv->promised_date->format('M d, Y') }}</span>
                                     @elseif($inv->due_date)
-                                        {{ $inv->due_date->format('M d, Y') }}
+                                        <span class="{{ $inv->status === 'overdue' ? 'text-danger fw-bold' : '' }}">
+                                            {{ $inv->due_date->format('M d, Y') }}
+                                        </span>
                                     @else
                                         &mdash;
                                     @endif
                                 </td>
-                                <td data-label="Amount" class="fw-bold text-nowrap">
+                                <td data-label="Assessed" class="fw-bold text-nowrap">
                                     @if($inv->status === 'promised')
                                         <span class="text-decoration-line-through text-muted me-1">₱{{ number_format((float)$inv->amount, 2) }}</span>
                                         <span class="text-primary small">(In Finals)</span>
@@ -336,53 +420,45 @@
                                         ₱{{ number_format((float)$inv->amount, 2) }}
                                     @endif
                                 </td>
+                                <td data-label="Paid / Balance" class="text-nowrap">
+                                    @if($inv->status === 'paid')
+                                        <span class="text-success fw-semibold">Paid ₱{{ number_format((float)$inv->amount_paid, 2) }}</span>
+                                    @elseif($inv->status === 'promised')
+                                        <span class="text-muted small">₱0.00 (Rolled Over)</span>
+                                    @else
+                                        <span class="text-danger fw-semibold">Bal: ₱{{ number_format((float)$inv->balance(), 2) }}</span>
+                                    @endif
+                                </td>
                                 <td data-label="Status"><span class="badge {{ $inv->statusBadgeClass() }}">{{ $inv->statusLabel() }}</span></td>
                                 <td class="text-end text-nowrap mobile-card-actions">
-                                    @if(!in_array($inv->status, ['paid', 'pending_verification', 'promised'], true))
-                                        <a href="{{ route('student.billing.pay', $inv) }}" class="btn btn-xs btn-gcash btn-sm py-1 px-3">
-                                            <i class="bi bi-wallet2 me-1"></i>Pay (GCash / Cash)
-                                        </a>
-                                    @elseif($inv->latestPayment)
-                                        <a href="{{ route('student.receipt', $inv->latestPayment) }}" class="btn btn-outline-secondary btn-sm py-1 px-3">
-                                            <i class="bi bi-receipt me-1"></i>View Official Receipt
-                                        </a>
-                                    @endif
+                                    <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                        @if(!in_array($inv->status, ['paid', 'pending_verification', 'promised'], true))
+                                            <a href="{{ route('student.billing.pay', $inv) }}" class="btn btn-xs {{ $inv->status === 'overdue' ? 'btn-danger' : 'btn-gcash' }} btn-sm py-1 px-3 fw-semibold">
+                                                <i class="bi bi-wallet2 me-1"></i>{{ $inv->status === 'overdue' ? 'Pay Overdue (Lift Restriction)' : 'Pay (GCash / Cash)' }}
+                                            </a>
+                                        @endif
+                                        @if($inv->isInstallment() && $inv->status === 'unpaid' && $inv->invoice_type !== 'finals_installment')
+                                            <a href="{{ route('student.promissory') }}" class="btn btn-outline-primary btn-sm py-1 px-2" title="Submit Promissory Note before deadline to move balance to Finals">
+                                                <i class="bi bi-file-earmark-ruled"></i> Promissory
+                                            </a>
+                                        @endif
+                                        @if($inv->latestPayment)
+                                            <a href="{{ route('student.receipt', $inv->latestPayment) }}" class="btn btn-outline-secondary btn-sm py-1 px-3">
+                                                <i class="bi bi-receipt me-1"></i>View Official Receipt
+                                            </a>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     No invoices generated yet. Once the Registrar approves your enrollment documents, your tuition &amp; installment schedule will appear here.
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Screen 1 Recent Activity Feed: Automated Email & System Notifications -->
-    <div class="col-lg-5">
-        <div class="card p-3 p-md-4 h-100">
-            <h6 class="fw-bold mb-3"><i class="bi bi-envelope-paper-fill text-primary me-2"></i>Recent Activity &amp; System Alerts</h6>
-            <div class="list-group list-group-flush small">
-                @forelse($notifications as $notif)
-                    <div class="list-group-item px-0 py-3 d-flex align-items-start gap-2">
-                        <div class="aurum-activity-avatar mt-1">
-                            <i class="bi bi-bell-fill"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-1 mb-1">
-                                <span class="fw-bold text-dark">{{ $notif->subject }}</span>
-                                <span class="badge bg-light text-muted border">{{ $notif->sent_at?->diffForHumans() }}</span>
-                            </div>
-                            <p class="text-muted mb-0" style="white-space: pre-line; font-size: 0.79rem;">{{ $notif->message }}</p>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-muted text-center py-4">No notifications yet.</div>
-                @endforelse
             </div>
         </div>
     </div>

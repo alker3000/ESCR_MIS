@@ -83,21 +83,17 @@ class EscrEnrollmentSystemTest extends TestCase
             ->where('invoice_type', 'midterm_installment')
             ->firstOrFail();
 
+        $semifinalInvoice = Invoice::where('user_id', $student->id)
+            ->where('invoice_type', 'semifinal_installment')
+            ->firstOrFail();
+
         $finalsInvoice = Invoice::where('user_id', $student->id)
             ->where('invoice_type', 'finals_installment')
             ->firstOrFail();
 
         $this->assertEquals(5000.00, (float) $finalsInvoice->amount);
 
-        // 1. Simulate missing the Midterm deadline -> Account Exam Restricted
-        $this->actingAs($student)
-            ->post(route('student.billing.simulate_overdue', $midtermInvoice))
-            ->assertRedirect(route('student.promissory'));
-
-        $enrollment->refresh();
-        $this->assertTrue($enrollment->exam_restricted);
-
-        // 2. Student uploads signed Promissory Note to warn Registrar
+        // 1. Before deadline (while Midterm is still 'unpaid'): Student uploads signed Promissory Note to warn Registrar
         $fakePdf = UploadedFile::fake()->create('signed_promissory_note.pdf', 120, 'application/pdf');
         $this->actingAs($student)
             ->post(route('student.promissory.upload'), [
@@ -113,7 +109,7 @@ class EscrEnrollmentSystemTest extends TestCase
         $note = PromissoryNote::where('invoice_id', $midtermInvoice->id)->firstOrFail();
         $this->assertEquals('pending_review', $note->status);
 
-        // 3. Registrar approves Promissory Note -> Moves ₱5,000 balance to Finals Installment (₱10,000) and clears student for exam!
+        // 2. Registrar approves Promissory Note -> Moves ₱5,000 balance to Finals Installment (₱10,000) and keeps student cleared!
         $this->actingAs($registrar)
             ->post(route('registrar.promissory.approve', $note), [
                 'registrar_remarks' => 'Parent signature verified. Moved Midterm tuition to Finals.',
@@ -129,6 +125,47 @@ class EscrEnrollmentSystemTest extends TestCase
         $this->assertEquals('promised', $midtermInvoice->status);
         $this->assertEquals(0.00, $midtermInvoice->balance());
         $this->assertEquals(10000.00, (float) $finalsInvoice->amount);
+        $this->assertFalse($enrollment->exam_restricted);
+
+        // 3. Simulate missing the Semi-Finals payment deadline (Late) -> Student is Exam Restricted & CANNOT pass a Promissory Note!
+        $this->actingAs($student)
+            ->post(route('student.billing.simulate_overdue', $semifinalInvoice))
+            ->assertRedirect(route('student.billing'));
+
+        $enrollment->refresh();
+        $semifinalInvoice->refresh();
+        $this->assertEquals('overdue', $semifinalInvoice->status);
+        $this->assertTrue($enrollment->exam_restricted);
+
+        // Attempting to upload a Promissory Note for the late/overdue installment is blocked
+        $latePdf = UploadedFile::fake()->create('late_note.pdf', 100, 'application/pdf');
+        $this->actingAs($student)
+            ->post(route('student.promissory.upload'), [
+                'invoice_id' => $semifinalInvoice->id,
+                'promised_settlement_date' => '2027-11-09',
+                'student_contact' => '09175550101',
+                'guardian_name' => 'Ricardo Dela Cruz',
+                'guardian_contact' => '09175550199',
+                'signed_note_file' => $latePdf,
+            ])
+            ->assertRedirect(route('student.promissory'))
+            ->assertSessionHas('error');
+
+        $this->assertNull(PromissoryNote::where('invoice_id', $semifinalInvoice->id)->first());
+
+        // Paying the late/overdue Semi-Finals installment via GCash immediately lifts the exam restriction!
+        $this->actingAs($student)
+            ->post(route('student.billing.pay.submit', $semifinalInvoice), [
+                'payment_mode' => 'sandbox_instant',
+                'gcash_sender_name' => $student->name,
+                'gcash_sender_number' => '09175550101',
+                'gcash_reference_number' => '9018777666555',
+            ])
+            ->assertRedirect();
+
+        $enrollment->refresh();
+        $semifinalInvoice->refresh();
+        $this->assertEquals('paid', $semifinalInvoice->status);
         $this->assertFalse($enrollment->exam_restricted);
 
         // 4. Student pays the Finals Installment (₱10,000) via Walk-In Cash -> Cashier confirms cash -> Issued Official Receipt!

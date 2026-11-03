@@ -100,22 +100,19 @@
                         <td class="text-end text-nowrap mobile-card-actions">
                             <div class="d-flex justify-content-end gap-1 flex-wrap w-100">
                                 @if(!in_array($inv->status, ['paid', 'pending_verification', 'promised'], true))
-                                    <a href="{{ route('student.billing.pay', $inv) }}" class="btn btn-sm btn-gcash">
-                                        <i class="bi bi-wallet2 me-1"></i>Pay (GCash / Cash)
+                                    <a href="{{ route('student.billing.pay', $inv) }}" class="btn btn-sm {{ $inv->status === 'overdue' ? 'btn-danger fw-bold' : 'btn-gcash' }}">
+                                        <i class="bi bi-wallet2 me-1"></i>{{ $inv->status === 'overdue' ? 'Pay Overdue (Lift Exam Restriction)' : 'Pay (GCash / Cash)' }}
                                     </a>
                                 @endif
 
                                 @if($inv->isInstallment() && $inv->status === 'unpaid' && $inv->invoice_type !== 'finals_installment')
                                     <form action="{{ route('student.billing.simulate_overdue', $inv) }}" method="POST" class="d-inline flex-fill">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100" title="Demo Trigger: Simulate missing this deadline to test Promissory Note Rollover to Finals">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100" title="Demo Trigger: Simulate missing this payment deadline (Account becomes Exam Restricted until paid)">
                                             <i class="bi bi-clock-history"></i> Simulate Late
                                         </button>
                                     </form>
-                                @endif
-
-                                @if($inv->status === 'overdue' || ($inv->isInstallment() && $inv->status === 'unpaid' && $inv->invoice_type !== 'finals_installment'))
-                                    <a href="{{ route('student.promissory') }}" class="btn btn-sm {{ $inv->status === 'overdue' ? 'btn-danger' : 'btn-outline-primary' }}">
+                                    <a href="{{ route('student.promissory') }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-file-earmark-ruled me-1"></i>Promissory Note
                                     </a>
                                 @endif

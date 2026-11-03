@@ -555,12 +555,34 @@
         <div class="container-fluid px-2 px-sm-3 px-lg-4">
             <div class="d-flex align-items-center gap-2">
                 @auth
+                    @php
+                        $headerNotifications = auth()->user()->systemNotifications()->latest()->take(12)->get();
+                        $unreadNotifCount = $headerNotifications->where('is_read', false)->count();
+                    @endphp
                     @if(!auth()->user()->isStudent())
                         <!-- Mobile Offcanvas Drawer Trigger for Staff/Admin (< 768px) -->
                         <button class="btn btn-sm btn-outline-primary d-md-none px-2 py-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebarDrawer" aria-label="Open Portal Menu">
                             <i class="bi bi-layout-sidebar-inset fs-5"></i>
                         </button>
                     @endif
+
+                    <!-- Top-Left Notification Button (Opens Recent Activity & System Alerts Drawer) -->
+                    <button class="btn btn-sm position-relative d-inline-flex align-items-center gap-1 px-2 py-1 shadow-sm"
+                            type="button"
+                            id="topLeftNotificationBtn"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#notificationsDrawer"
+                            aria-controls="notificationsDrawer"
+                            title="Recent Activity & System Alerts"
+                            style="background: linear-gradient(145deg, #360B10 0%, #24070B 100%); color: #F3D87D; border: 1.5px solid #D4AF37; border-radius: 0.55rem;">
+                        <i class="bi bi-bell-fill"></i>
+                        <span class="d-none d-sm-inline fw-bold" style="font-size: 0.74rem;">Alerts</span>
+                        @if($unreadNotifCount > 0)
+                            <span class="badge rounded-pill" style="background: #D4AF37; color: #24070B; font-size: 0.65rem;">{{ $unreadNotifCount }}</span>
+                        @elseif($headerNotifications->isNotEmpty())
+                            <span class="badge rounded-pill" style="background: rgba(212, 175, 55, 0.22); color: #F3D87D; font-size: 0.65rem;">{{ $headerNotifications->count() }}</span>
+                        @endif
+                    </button>
                 @endauth
 
                 <a class="navbar-brand d-flex align-items-center gap-2 fw-bold me-0" href="{{ route('home') }}">
@@ -695,6 +717,61 @@
     </nav>
 
     @auth
+        <!-- Top-Left Slide-Out Notification Drawer (Recent Activity & System Alerts) -->
+        <div class="offcanvas offcanvas-start d-print-none" tabindex="-1" id="notificationsDrawer" aria-labelledby="notificationsDrawerLabel" style="width: 380px; max-width: 92vw; background-color: #FAF8F5; border-right: 2px solid #D4AF37;">
+            <div class="offcanvas-header text-white" style="background: linear-gradient(135deg, #24070B 0%, #3D0E14 100%); border-bottom: 2px solid #D4AF37;">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: rgba(212, 175, 55, 0.18); color: #F3D87D; border: 1px solid #D4AF37;">
+                        <i class="bi bi-bell-fill"></i>
+                    </span>
+                    <div>
+                        <h6 class="offcanvas-title fw-bold mb-0 text-white" id="notificationsDrawerLabel">Recent Activity &amp; System Alerts</h6>
+                        <small style="font-size: 0.72rem; color: #F3D87D;">
+                            {{ $unreadNotifCount > 0 ? "{$unreadNotifCount} Unread Alert(s)" : 'Automated Email & Portal Feed' }}
+                        </small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body p-3">
+                @if($unreadNotifCount > 0)
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: #EBE5DC !important;">
+                        <span class="small fw-semibold text-muted">You have {{ $unreadNotifCount }} unread alert(s)</span>
+                        <form action="{{ route('notifications.read_all') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.72rem;">
+                                <i class="bi bi-check2-all me-1"></i>Mark All Read
+                            </button>
+                        </form>
+                    </div>
+                @endif
+
+                <div class="d-flex flex-column gap-2">
+                    @forelse($headerNotifications as $notif)
+                        <div class="card p-3 border {{ !$notif->is_read ? 'border-warning shadow-sm' : '' }}" style="background: {{ !$notif->is_read ? '#FFFDF7' : '#FFFFFF' }};">
+                            <div class="d-flex align-items-start gap-2">
+                                <div class="aurum-activity-avatar mt-1">
+                                    <i class="bi bi-envelope-paper-fill"></i>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="d-flex justify-content-between align-items-start gap-1 mb-1">
+                                        <span class="fw-bold text-dark small">{{ $notif->subject }}</span>
+                                        <span class="badge bg-light text-muted border flex-shrink-0" style="font-size: 0.65rem;">{{ $notif->sent_at?->diffForHumans() }}</span>
+                                    </div>
+                                    <p class="text-muted mb-0" style="white-space: pre-line; font-size: 0.78rem;">{{ $notif->message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-muted py-5 small">
+                            <i class="bi bi-bell-slash fs-2 d-block mb-2" style="color: #B99256;"></i>
+                            No recent activity or system alerts yet.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
         <!-- Mobile Slide-Out Offcanvas Sidebar Drawer (< 768px) -->
         <div class="offcanvas offcanvas-start d-md-none d-print-none" tabindex="-1" id="mobileSidebarDrawer" aria-labelledby="mobileSidebarDrawerLabel" style="width: 280px; background: linear-gradient(180deg, #24070B 0%, #360B10 100%); color: #FAF8F5;">
             <div class="offcanvas-header border-bottom" style="border-color: #4A121B !important;">

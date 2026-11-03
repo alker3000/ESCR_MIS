@@ -41,14 +41,15 @@
 
                 @php
                     $unpaidSpecial = $invoices->where('invoice_type', 'special_exam_fee')->where('status', '!=', 'paid')->first();
+                    $overdueInvoice = $invoices->where('status', 'overdue')->first();
                 @endphp
 
                 <div class="bg-light p-3 rounded border mb-4 small">
-                    <div class="fw-bold mb-1">How to Lift Your Exam Restriction (ESCR Promissory Note Policy):</div>
+                    <div class="fw-bold mb-1">How to Lift Your Exam Restriction (ESCR Policy):</div>
                     <ol class="mb-0">
-                        <li>If you cannot pay your current term installment on time, download &amp; submit a parent-signed <strong>Promissory Note</strong> to notify the Office of the Registrar.</li>
-                        <li>Once the Registrar approves your Promissory Note, your unpaid balance for that term is <strong>automatically moved to your Final Term Installment</strong>.</li>
-                        <li>Your account is then immediately <strong>Cleared for Examination</strong>!</li>
+                        <li>Because the tuition payment deadline has passed without an advance Promissory Note, Promissory Note submission is closed for the overdue term and your account is restricted from taking the examination.</li>
+                        <li>Settle your overdue installment balance via <strong>GCash (Instant / Manual QR)</strong> or <strong>Walk-In Cash at the School Cashier</strong>.</li>
+                        <li>Once your payment is verified, your exam restriction is <strong>immediately lifted</strong> and your Digital Exam Permit is unlocked!</li>
                     </ol>
                 </div>
 
@@ -57,12 +58,16 @@
                         <a href="{{ route('student.billing.pay', $unpaidSpecial) }}" class="btn btn-gcash btn-lg fw-bold w-100 w-sm-auto">
                             <i class="bi bi-phone-fill me-2"></i>Pay Special Exam Fee (₱{{ number_format((float)$unpaidSpecial->amount, 2) }}) via GCash Now
                         </a>
-                    @else
-                        <a href="{{ route('student.promissory') }}" class="btn btn-danger btn-lg fw-bold w-100 w-sm-auto">
-                            <i class="bi bi-file-earmark-ruled me-2"></i>Submit Promissory Note
+                    @elseif($overdueInvoice)
+                        <a href="{{ route('student.billing.pay', $overdueInvoice) }}" class="btn btn-danger btn-lg fw-bold w-100 w-sm-auto">
+                            <i class="bi bi-wallet2 me-2"></i>Pay Overdue {{ $overdueInvoice->title }} (₱{{ number_format((float)$overdueInvoice->balance(), 2) }}) to Lift Restriction
                         </a>
+                        <a href="{{ route('student.billing') }}" class="btn btn-outline-dark btn-lg fw-semibold w-100 w-sm-auto">
+                            <i class="bi bi-list-check me-2"></i>View Full Billing Ledger
+                        </a>
+                    @else
                         <a href="{{ route('student.billing') }}" class="btn btn-gcash btn-lg fw-bold w-100 w-sm-auto">
-                            <i class="bi bi-wallet2 me-2"></i>Pay Installment via GCash
+                            <i class="bi bi-wallet2 me-2"></i>Pay Installment via GCash / Cash to Lift Restriction
                         </a>
                     @endif
                 </div>

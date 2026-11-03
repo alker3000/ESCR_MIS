@@ -46,6 +46,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('documents.payment_proof');
     Route::get('/receipt/{payment}', [StudentPortalController::class, 'receipt'])
         ->name('student.receipt');
+    Route::post('/account/notifications/read-all', [StudentPortalController::class, 'markAllNotificationsRead'])
+        ->name('notifications.read_all');
 });
 
 /*

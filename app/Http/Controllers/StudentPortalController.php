@@ -360,7 +360,7 @@ class StudentPortalController extends Controller
 
     /**
      * Demo helper: Simulates missing an installment deadline so the student/instructor can demonstrate
-     * the Overdue -> Account Restricted -> Promissory Note -> Special Exam Fee -> GCash Payment flow live!
+     * the Overdue (Late) -> Account Exam Restricted -> Lifted only after paying workflow!
      */
     public function simulateOverdue(Invoice $invoice)
     {
@@ -377,8 +377,8 @@ class StudentPortalController extends Controller
             $this->paymentService->refreshExamClearanceStatus($invoice->enrollment);
         }
 
-        return redirect()->route('student.promissory')
-            ->with('warning', "Demo Mode: {$invoice->title} has been marked OVERDUE and your account is now Exam Restricted. You can now download and submit your Promissory Note below!");
+        return redirect()->route('student.billing')
+            ->with('warning', "Late Payment Simulated: {$invoice->title} is now OVERDUE. Because the deadline has passed, Promissory Note submission is closed for this installment and your account is Exam Restricted until the overdue balance is paid.");
     }
 
     public function receipt(Payment $payment)
@@ -407,6 +407,7 @@ class StudentPortalController extends Controller
             $enrollment->refresh();
         }
 
+        // Only upcoming UNPAID installments (not late/overdue) are eligible for a Promissory Note
         $installmentInvoices = $student->invoices()
             ->when($enrollment, fn ($q) => $q->where('enrollment_id', $enrollment->id))
             ->whereIn('invoice_type', [
@@ -415,7 +416,19 @@ class StudentPortalController extends Controller
                 'semifinal_installment',
                 'finals_installment',
             ])
-            ->whereIn('status', ['unpaid', 'overdue'])
+            ->where('status', 'unpaid')
+            ->get();
+
+        // Late / Overdue installments cannot pass a Promissory Note; they must be paid to lift restriction
+        $overdueInstallments = $student->invoices()
+            ->when($enrollment, fn ($q) => $q->where('enrollment_id', $enrollment->id))
+            ->whereIn('invoice_type', [
+                'prelim_installment',
+                'midterm_installment',
+                'semifinal_installment',
+                'finals_installment',
+            ])
+            ->where('status', 'overdue')
             ->get();
 
         $promissoryNotes = $student->promissoryNotes()
@@ -429,6 +442,7 @@ class StudentPortalController extends Controller
             'enrollment',
             'enrollments',
             'installmentInvoices',
+            'overdueInstallments',
             'promissoryNotes',
             'settings'
         ));
@@ -444,11 +458,10 @@ class StudentPortalController extends Controller
 
         $invoiceId = $request->query('invoice_id');
         $selectedInvoice = $invoiceId
-            ? Invoice::where('user_id', $student->id)->find($invoiceId)
+            ? Invoice::where('user_id', $student->id)->where('status', 'unpaid')->find($invoiceId)
             : $student->invoices()
                 ->whereIn('invoice_type', ['prelim_installment', 'midterm_installment', 'semifinal_installment', 'finals_installment'])
-                ->whereIn('status', ['overdue', 'unpaid'])
-                ->orderByRaw("CASE WHEN status = 'overdue' THEN 0 ELSE 1 END")
+                ->where('status', 'unpaid')
                 ->first();
 
         $settings = SystemSetting::getAllKeyed();
@@ -477,6 +490,11 @@ class StudentPortalController extends Controller
 
         $student = Auth::user();
         $invoice = Invoice::where('user_id', $student->id)->findOrFail($validated['invoice_id']);
+
+        if ($invoice->status === 'overdue' || ($invoice->due_date && $invoice->due_date->isPast())) {
+            return redirect()->route('student.promissory')
+                ->with('error', 'Promissory Notes cannot be submitted once an installment is late/overdue. Your account is Exam Restricted until the overdue balance is paid.');
+        }
 
         $note = $this->promissoryNoteService->submitPromissoryNote(
             $student,
@@ -553,5 +571,14 @@ class StudentPortalController extends Controller
             $notification->update(['is_read' => true]);
         }
         return back();
+    }
+
+    public function markAllNotificationsRead()
+    {
+        SystemNotification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return back()->with('success', 'All notifications marked as read.');
     }
 }

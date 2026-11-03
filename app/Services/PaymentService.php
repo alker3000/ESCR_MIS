@@ -291,7 +291,7 @@ class PaymentService
             $firstOverdue = $overdueInstallments->first();
             $enrollment->update([
                 'exam_restricted' => true,
-                'exam_restriction_reason' => "Overdue {$firstOverdue->title} (PHP " . number_format((float) $firstOverdue->amount, 2) . "). Submit a signed Promissory Note to request exam clearance.",
+                'exam_restriction_reason' => "Overdue {$firstOverdue->title} (PHP " . number_format((float) $firstOverdue->amount, 2) . "). Promissory Note submission is closed for late installments — please pay the overdue balance via GCash or Walk-In Cash to lift your exam restriction.",
             ]);
             return;
         }

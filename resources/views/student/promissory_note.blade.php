@@ -40,14 +40,34 @@
         <div class="card p-3 p-md-4 h-100">
             <h5 class="fw-bold mb-2">Submit Signed Promissory Note</h5>
             <p class="text-muted small mb-3">
-                Under <strong>East Systems Colleges of Rizal</strong> policy, a Promissory Note serves as an official letter notifying the Registrar that you cannot pay the current term's tuition on time. Upon Registrar approval, the unpaid balance of your selected term (e.g., Prelim, Midterm, or Semi-Finals) is <strong>carried over and added into your 4th (Finals) Installment</strong>, and your Exam Clearance is unlocked.
+                Under <strong>East Systems Colleges of Rizal</strong> policy, a Promissory Note must be submitted <strong>before the installment deadline</strong> to notify the Registrar ahead of time. Once an installment becomes <strong>late/overdue</strong>, Promissory Note submission is closed and the account is restricted from taking the exam until the overdue tuition is paid.
             </p>
+
+            @if(isset($overdueInstallments) && $overdueInstallments->isNotEmpty())
+                <div class="alert alert-danger small mb-3">
+                    <div class="fw-bold mb-1"><i class="bi bi-shield-lock-fill me-1"></i>Late / Overdue Installment — Exam Restricted</div>
+                    <p class="mb-2">
+                        You have {{ $overdueInstallments->count() }} overdue installment(s). Because the deadline has passed, a Promissory Note can no longer be submitted for:
+                    </p>
+                    @foreach($overdueInstallments as $ovInv)
+                        <div class="d-flex justify-content-between align-items-center bg-white rounded p-2 border mb-1">
+                            <div>
+                                <div class="fw-bold text-dark">{{ $ovInv->title }}</div>
+                                <div class="text-danger fw-semibold">₱{{ number_format((float)$ovInv->balance(), 2) }} (Overdue)</div>
+                            </div>
+                            <a href="{{ route('student.billing.pay', $ovInv) }}" class="btn btn-danger btn-sm fw-bold">
+                                <i class="bi bi-wallet2 me-1"></i>Pay to Lift Restriction
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
 
             @if($installmentInvoices->isNotEmpty())
                 <form action="{{ route('student.promissory.upload') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label small fw-semibold">Select Unpaid / Overdue Term Installment</label>
+                        <label class="form-label small fw-semibold">Select Upcoming Unpaid Term Installment (Before Deadline)</label>
                         <select name="invoice_id" id="pnInvoiceSelect" class="form-select" required onchange="updateTemplateLink()">
                             @foreach($installmentInvoices as $inv)
                                 <option value="{{ $inv->id }}">
