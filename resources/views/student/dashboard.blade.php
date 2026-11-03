@@ -3,38 +3,45 @@
 @section('title', 'Student Dashboard | ESCR Portal')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-    <div>
-        <h4 class="fw-bold mb-1">Welcome, {{ $student->name }}!</h4>
-        <div class="text-muted small">
-            @if($student->student_number)
-                <span class="badge bg-dark me-1 mb-1">Student ID: {{ $student->student_number }}</span>
-            @endif
-            @if($enrollment)
-                <span class="d-inline-block">{{ $enrollment->course }} &bull; {{ $enrollment->year_level }} &bull; {{ $enrollment->academic_year }} ({{ $enrollment->semester }})</span>
-            @else
-                <span>Complete your online enrollment form to get started.</span>
-            @endif
+<div class="escr-hero-banner p-3 p-md-4 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <span class="badge fw-bold px-2 py-1" style="background-color: #facc15; color: #7f1d1d;">
+                    <i class="bi bi-mortarboard-fill me-1"></i>{{ $enrollment ? "{$enrollment->semester} • {$enrollment->academic_year}" : ($settings['semester'] ?? '1st Semester') }}
+                </span>
+                @if($student->student_number)
+                    <span class="badge bg-white text-dark fw-bold font-mono">ID: {{ $student->student_number }}</span>
+                @endif
+            </div>
+            <h4 class="fw-extrabold mb-1 text-white">Welcome, {{ $student->name }}!</h4>
+            <div class="small" style="color: #fef08a;">
+                @if($enrollment)
+                    <span>{{ $enrollment->course }} &bull; {{ $enrollment->year_level }} ({{ $enrollment->student_type }})</span>
+                @else
+                    <span>Complete your online enrollment form to get started.</span>
+                @endif
+            </div>
         </div>
-    </div>
-    <div class="d-flex flex-wrap gap-2 w-100 w-md-auto mt-1 mt-md-0 align-items-center" style="max-width: 100%;">
-        @if(isset($enrollments) && $enrollments->count() > 1)
-            <form action="{{ route('student.dashboard') }}" method="GET" class="flex-fill flex-md-grow-0">
-                <select name="enrollment_id" class="form-select form-select-sm fw-semibold border-primary text-primary" onchange="this.form.submit()">
-                    @foreach($enrollments as $enrItem)
-                        <option value="{{ $enrItem->id }}" {{ $enrollment?->id === $enrItem->id ? 'selected' : '' }}>
-                            {{ $enrItem->semester }} ({{ $enrItem->academic_year }}) &bull; {{ $enrItem->year_level }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
-        @endif
-        <a href="{{ route('student.tela') }}" class="btn btn-outline-primary btn-sm fw-semibold flex-fill flex-md-grow-0">
-            <i class="bi bi-scissors me-1"></i>Order Uniform Tela
-        </a>
-        <a href="{{ route('student.billing', $enrollment ? ['enrollment_id' => $enrollment->id] : []) }}" class="btn btn-gcash btn-sm px-3 flex-fill flex-md-grow-0">
-            <i class="bi bi-wallet2 me-1"></i>Pay via GCash
-        </a>
+        <div class="d-flex flex-wrap gap-2 w-100 w-md-auto mt-1 mt-md-0 align-items-center" style="max-width: 100%;">
+            @if(isset($enrollments) && $enrollments->count() > 1)
+                <form action="{{ route('student.dashboard') }}" method="GET" class="flex-fill flex-md-grow-0">
+                    <select name="enrollment_id" class="form-select form-select-sm fw-bold border-warning" style="background-color:#fff;color:#7f1d1d;" onchange="this.form.submit()">
+                        @foreach($enrollments as $enrItem)
+                            <option value="{{ $enrItem->id }}" {{ $enrollment?->id === $enrItem->id ? 'selected' : '' }}>
+                                {{ $enrItem->semester }} ({{ $enrItem->academic_year }}) &bull; {{ $enrItem->year_level }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            @endif
+            <a href="{{ route('student.tela') }}" class="btn btn-light btn-sm fw-bold text-danger flex-fill flex-md-grow-0">
+                <i class="bi bi-scissors me-1"></i>Order Uniform Tela
+            </a>
+            <a href="{{ route('student.billing', $enrollment ? ['enrollment_id' => $enrollment->id] : []) }}" class="btn btn-warning btn-sm px-3 fw-bold flex-fill flex-md-grow-0">
+                <i class="bi bi-wallet2 me-1"></i>Pay Tuition / GCash
+            </a>
+        </div>
     </div>
 </div>
 

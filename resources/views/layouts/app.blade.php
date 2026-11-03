@@ -8,55 +8,142 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Outfit (Headings), Plus Jakarta Sans (Body/UI), JetBrains Mono (IDs & Currency) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --escr-red-dark: #7f1d1d;
+            --escr-red: #b91c1c;
+            --escr-red-bright: #dc2626;
+            --escr-red-soft: #fef2f2;
+            --escr-gold: #facc15;
+            --escr-gold-deep: #eab308;
+            --escr-gold-soft: #fefce8;
+            --bs-primary: #b91c1c;
+            --bs-primary-rgb: 185, 28, 28;
+            --bs-link-color: #b91c1c;
+            --bs-link-hover-color: #7f1d1d;
+        }
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
             color: #0f172a;
+            letter-spacing: -0.01em;
+            line-height: 1.55;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3, h4, h5, h6,
+        .escr-brand-title,
+        .display-5,
+        .display-6 {
+            font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.025em;
+        }
+        code, .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.86em;
+            color: #991b1b;
+            background-color: #fef2f2;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.35rem;
+            border: 1px solid #fecaca;
+        }
+        .table td, .table th, .fs-4, .fs-5 {
+            font-variant-numeric: tabular-nums;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+            border-color: #991b1b;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(185, 28, 28, 0.2);
+        }
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+            background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%) !important;
+            border-color: #7f1d1d !important;
+            color: #fef08a !important;
+        }
+        .btn-outline-primary {
+            color: #b91c1c;
+            border-color: #b91c1c;
+            font-weight: 600;
+        }
+        .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary.active {
+            background-color: #b91c1c !important;
+            border-color: #b91c1c !important;
+            color: #fef08a !important;
+        }
+        .btn-warning {
+            background-color: #facc15;
+            border-color: #eab308;
+            color: #7f1d1d;
+            font-weight: 700;
+        }
+        .btn-warning:hover {
+            background-color: #eab308;
+            border-color: #ca8a04;
+            color: #450a0a;
+        }
+        .text-primary {
+            color: #b91c1c !important;
+        }
+        .bg-primary {
+            background-color: #b91c1c !important;
+        }
+        .border-primary {
+            border-color: #b91c1c !important;
         }
         .escr-topbar {
-            background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 100%);
-            color: #fff;
+            background: linear-gradient(90deg, #650f0f 0%, #991b1b 55%, #b91c1c 100%);
+            color: #ffffff;
+            border-bottom: 3px solid #facc15;
         }
         .escr-sidebar {
             background-color: #ffffff;
-            border-right: 1px solid #e2e8f0;
+            border-right: 1px solid #f1f5f9;
+            box-shadow: 2px 0 12px rgba(15, 23, 42, 0.02);
         }
         @media (min-width: 768px) {
             .escr-sidebar {
-                min-height: calc(100vh - 64px);
+                min-height: calc(100vh - 67px);
             }
         }
         .escr-sidebar .nav-link,
         .escr-offcanvas-nav .nav-link {
-            color: #475569;
-            font-weight: 500;
-            padding: 0.68rem 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.25rem;
+            color: #334155;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.7rem 1rem;
+            border-radius: 0.6rem;
+            margin-bottom: 0.3rem;
             display: flex;
             align-items: center;
             gap: 0.65rem;
-            transition: all 0.15s ease;
+            transition: all 0.18s ease;
+            border-left: 3px solid transparent;
         }
         .escr-sidebar .nav-link:hover,
         .escr-offcanvas-nav .nav-link:hover {
-            background-color: #f1f5f9;
-            color: #1e3a8a;
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left-color: #facc15;
         }
         .escr-sidebar .nav-link.active,
         .escr-offcanvas-nav .nav-link.active {
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            font-weight: 600;
+            background: linear-gradient(90deg, #b91c1c 0%, #991b1b 100%);
+            color: #fef08a;
+            font-weight: 700;
+            border-left: 3px solid #facc15;
+            box-shadow: 0 4px 10px rgba(185, 28, 28, 0.18);
         }
         .card {
+            background-color: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            border-radius: 0.85rem;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.035);
         }
         .card.border-start {
             border-top: 1px solid #e2e8f0 !important;
@@ -64,16 +151,23 @@
             border-bottom: 1px solid #e2e8f0 !important;
         }
         .kpi-accent-primary {
-            border-left: 4px solid #2563eb !important;
+            border-left: 4px solid #b91c1c !important;
         }
         .kpi-accent-success {
             border-left: 4px solid #16a34a !important;
         }
         .kpi-accent-warning {
-            border-left: 4px solid #d97706 !important;
+            border-left: 4px solid #eab308 !important;
         }
         .kpi-accent-danger {
             border-left: 4px solid #dc2626 !important;
+        }
+        .escr-hero-banner {
+            background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 60%, #dc2626 100%);
+            border-bottom: 4px solid #facc15;
+            border-radius: 0.9rem;
+            color: #ffffff;
+            box-shadow: 0 6px 18px rgba(127, 29, 29, 0.16);
         }
         .gcash-badge {
             background-color: #007dfe;
@@ -102,6 +196,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Outfit', sans-serif;
             font-weight: 700;
             margin-bottom: 0.35rem;
         }
@@ -109,8 +204,8 @@
         .escr-mobile-bottom-nav {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(8px);
-            border-top: 1px solid #e2e8f0;
-            box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.07);
+            border-top: 2px solid #facc15;
+            box-shadow: 0 -4px 16px rgba(127, 29, 29, 0.08);
             z-index: 1030;
             padding: 0.25rem 0.2rem calc(0.25rem + env(safe-area-inset-bottom, 0px));
         }
@@ -120,7 +215,7 @@
             padding: 0.3rem 0.1rem;
             color: #64748b;
             text-decoration: none;
-            font-size: 0.66rem;
+            font-size: 0.68rem;
             font-weight: 600;
             display: flex;
             flex-direction: column;
@@ -137,12 +232,13 @@
             transition: all 0.15s ease;
         }
         .escr-mobile-bottom-nav .mobile-tab.active {
-            color: #1d4ed8;
+            color: #b91c1c;
             font-weight: 700;
         }
         .escr-mobile-bottom-nav .mobile-tab.active i {
-            background-color: #dbeafe;
-            color: #1d4ed8;
+            background-color: #fef2f2;
+            color: #b91c1c;
+            box-shadow: inset 0 0 0 1px #facc15;
         }
         @media (max-width: 767.98px) {
             body.has-student-bottom-nav {
@@ -250,12 +346,12 @@
                 @endauth
 
                 <a class="navbar-brand d-flex align-items-center gap-2 text-white fw-bold me-0" href="{{ route('home') }}">
-                    <span class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center fw-extrabold flex-shrink-0" style="width:34px;height:34px;">
+                    <span class="rounded-circle d-inline-flex align-items-center justify-content-center fw-extrabold flex-shrink-0 shadow-sm" style="width:36px;height:36px;background-color:#facc15;color:#7f1d1d;border:2px solid #ffffff;">
                         <i class="bi bi-mortarboard-fill"></i>
                     </span>
                     <div class="text-truncate">
-                        <div class="lh-1 escr-brand-title text-truncate" style="font-size: 0.96rem; letter-spacing: 0.3px;">EAST SYSTEMS COLLEGES OF RIZAL</div>
-                        <small class="text-info fw-normal escr-brand-subtitle d-block text-truncate" style="font-size: 0.72rem;">
+                        <div class="lh-1 escr-brand-title text-truncate fw-extrabold" style="font-size: 1rem; letter-spacing: 0.2px;">EAST SYSTEMS COLLEGES OF RIZAL</div>
+                        <small class="fw-medium escr-brand-subtitle d-block text-truncate" style="font-size: 0.73rem; color: #fef08a;">
                             <span class="d-none d-sm-inline">Morong, Rizal &bull; Online Enrollment &amp; Payment System (SY 2026–2027)</span>
                             <span class="d-inline d-sm-none">Morong, Rizal &bull; SY 2026–2027 Portal</span>
                         </small>
